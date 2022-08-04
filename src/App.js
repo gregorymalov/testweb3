@@ -27,11 +27,18 @@ import { useMoralis, useMoralisWeb3Api } from "react-moralis";
 
 function App() {
   const [value, setValue] = useState("lol");
+  const [avatar, setAvatar] = useState(
+    "https://raritygram.io/avatars/ava-gray.png"
+  );
+  const [profile, setProfile] = useState(null);
+
+  const Web3Api = useMoralisWeb3Api();
   const {
     authenticate,
     isAuthenticated,
     isAuthenticating,
     user,
+    setUserData,
     account,
     logout,
   } = useMoralis();
@@ -65,16 +72,24 @@ function App() {
     // setValue(inputValue.value);
 
     if (isAuthenticated) {
+      setUserData({ username: value });
       user.setUsername(value);
     }
   };
 
   useEffect(() => {
-    console.log("value", value);
-    // console.log(fetchTokenBalances);
-  });
+    if (isAuthenticated) {
+      setProfile(<img src={avatar} alt="avatar" />);
+    } else {
+      setProfile(null);
+    }
 
-  // const Web3Api = useMoralisWeb3Api();
+    // fetchTokenBalances();
+  }, [isAuthenticated]);
+
+  // useEffect(() => {
+  //   setAvatar(user.get("avatar"));
+  // }, []);
 
   // const fetchTokenBalances = async () => {
   //   const balances = await Web3Api.account.getTokenBalances();
@@ -85,6 +100,8 @@ function App() {
     <div>
       <h1>Raritygram The Best Social Web3 Network!</h1>
       {isAuthenticated && user.get("ethAddress")}
+      {isAuthenticated && user.get("avatar")}
+
       <br />
       {isAuthenticated && user.get("username")}
       {/* {isAuthenticated && user.setUsername("Mary Jane")} */}
@@ -98,6 +115,7 @@ function App() {
       />
       {isAuthenticated && user.setUsername(value)}
 
+      {profile}
       <button onClick={setName}>EDIT</button>
       <button onClick={login}>Metamask Login</button>
       <button onClick={logOut} disabled={isAuthenticating}>
